@@ -9,6 +9,7 @@ function TodoForm({addTodo}) {
         if (userInput !== "") {
             addTodo(userInput);
         } 
+        document.querySelector('#todoText').value = "";   
     }
 
     const changeState = (e) => {

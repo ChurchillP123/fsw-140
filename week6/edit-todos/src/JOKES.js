@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
+import axios from 'axios'
 
 export const listOfJokes = [
     {   id: uuidv4(),
@@ -20,3 +21,11 @@ export const listOfJokes = [
         isFunny: false
     }
 ];
+
+fetch('/allTodos')
+  .then(response => response.json())
+  .then(data => console.log(data));
+
+
+
+
