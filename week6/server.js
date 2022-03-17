@@ -1,6 +1,8 @@
 const express = require("express");
+const cors = require('cors');
 const mysql = require("mysql2");
 const app = express();
+app.use(cors());
 
 const db = mysql.createConnection({
     host: 'localhost',
@@ -40,15 +42,15 @@ app.get('/CreateTable', (req, res) => {
     })
 })
 
-app.get('/addTodo', (req, res) => {
-    let post = {text: 'First Post', isCompleted: false};
+app.get('/addTodo/:text', (req, res) => {
+    let post = {text: req.params.text, isCompleted: false};
     let sql = "INSERT INTO todos SET ?";
     db.query(sql,post, (err, result) => {
         if(err) {
             throw err;
         }
-        res.send("Data Inserted Successfully"); 
-        console.log("First Record Inserted in the Table Successfully!")
+        res.send(result); 
+        console.log("Record Inserted in the Table Successfully!")
     })
 })
 
@@ -70,7 +72,7 @@ app.get('/allTodos', (req, res) => {
         if(err) {
             throw err;
         }
-        res.send("Data Selection Executed Successfully"); 
+        res.send(result); 
         console.log(result)
     })
 })
@@ -105,6 +107,18 @@ app.get('/DeleteTodo/:id', (req, res) => {
             throw err;
         }
         res.send("Row Deleted Successfully!"); 
+        console.log(result)
+    })
+})
+
+app.get('/completeTodo/:id/:boolean', (req, res) => {
+    let sql = `UPDATE todos SET isCompleted = ${req.params.boolean} WHERE id = ${req.params.id} `;
+    console.log(sql)
+    db.query(sql, (err, result) => {
+        if(err) {
+            throw err;
+        }
+        res.send(result); 
         console.log(result)
     })
 })
