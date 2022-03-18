@@ -1,23 +1,24 @@
 import './App.css';
-import ToDoList from './ToDoList.js';
+import ToDoList from '../components/ToDoList'
 //import {listOfJokes} from './JOKES.js';
 import {useState, useEffect} from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import TodoForm from './TodoForm.js';
+import TodoForm from './components/TodoForm';
 import axios from 'axios';
 
 
 function App() {
   const [todos, setTodos] = useState([])
+  const [text, setText] = useState("")
 
-  function allTodos(){
-    axios.get("http://localhost:9000/allTodos")
-    .then(res => setTodos(res.data))
-    .catch(err => console.log(err))
-  }
+
 
   useEffect(() => {
-    allTodos();
+    axios.get("http://localhost:9000/allTodos")
+    .then((todos) => {
+      setTodos(todos.data)
+      console.log(todos.data)
+    })
   }, []);
 
 
@@ -31,19 +32,9 @@ function App() {
     .catch(err => console.log(err))
   }
 
-  const deleteTodo = (id) => {
-    const tempTodos = [...todos];
-    const filteredTodos = tempTodos.filter(todo => todo.id !== id);
-    setTodos(filteredTodos);
-  }
+ 
 
-  const addTodo = async(text) => {
-    const res = await axios.get(`http://localhost:9000/addTodo/${text}`)
-
-    const newTodo = await res.data;
-    const addedTodos = [...todos, newTodo];
-    setTodos(addedTodos);
-  }
+  
 
   const editTodo = (obj, updates) => {
     const tempTodos = [...todos];
@@ -56,8 +47,10 @@ function App() {
   return (
       <>
         <h1>List of Todos</h1>
-        <TodoForm addTodo ={addTodo}/>
-        <ToDoList todos ={todos} completeTodo ={completeTodo} deleteTodo ={deleteTodo} editTodo ={editTodo}/>
+    
+        <TodoForm />
+        <ToDoList
+        todos ={todos} completeTodo ={completeTodo} editTodo ={editTodo}/>
       </>
   );
 }

@@ -1,31 +1,42 @@
+import axios from 'axios';
 import {useState} from 'react';
 
-function EditTodoForm({todo, addTodo, id, cancelBtn, editTodo}) {
+function EditTodoForm({todo}) {
+    
 
-    const [userInput, setUserInput] = useState(todo.text);
+    const [userInput, setUserInput] = useState("");
+    
+    
+//     const validateForm = (e) => {
+//         e.preventDefault();
+//         if (userInput !== "") {
+//             editTodo(todo, userInput);
+//         } 
 
-    const validateForm = (e) => {
-        e.preventDefault();
-        if (userInput !== "") {
-            editTodo(todo, userInput);
-        } 
+//     const cancel = cancelBtn;
+//     cancel();
+// }
 
-        const cancel = cancelBtn;
-        cancel();
-    }
+const updateClick = (id) => {
+    axios.put(`http://localhost:9000/UpdateTodo/:${id}`,{
+        id: todo.id,
+        text: userInput
+    })
+}
+const changeState = (e) => {
+    setUserInput(e.target.value);
+}
 
-    const changeState = (e) => {
-        setUserInput(e.target.value);
-    }
 
     return (
-        <form id={id} onSubmit={validateForm}>
+        <form>
             <label>Edit Todo: </label>
-            <input id={`todoText ${id}`} value ={userInput} onChange ={changeState} required></input>
-            {userInput.length > 0 && userInput.charAt(0) !== " " ? <button id={`updateFor${id}`}>Update</button> : <button type="button" disabled>Update</button>} 
-            <button onClick ={cancelBtn}>Cancel</button>
+            <input type='text' name="text" value ={userInput} onChange ={changeState}></input>
+            <button type='submit' onClick={()=>{updateClick(todo.id)}}>Update</button> 
+            
         </form>
     );
 }
+
 
 export default EditTodoForm;

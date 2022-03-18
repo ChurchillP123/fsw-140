@@ -2,14 +2,20 @@ const express = require("express");
 const cors = require('cors');
 const mysql = require("mysql2");
 const app = express();
-app.use(cors());
+const bodyParser= require('body-parser')
 
 const db = mysql.createConnection({
     host: 'localhost',
     user: 'root',
-    password: '7777@Jesus',
+    password: '',
     database: 'Todos'
 })
+
+
+app.use(express.json());
+app.use(cors());
+app.use(bodyParser.urlencoded({extended: true}));
+
 
 const PORT = 9000;
 
@@ -20,32 +26,32 @@ db.connect((err) => {
     console.log("MySql Database Connection Established Successfully!");
 })
 
-app.get('/CreateDB', (req, res) => {
-    let sql = "CREATE DATABASE Todos";
-    db.query(sql, (err, result) => {
-        if(err) {
-            throw err;
-        }
-        res.send("New Database Created Successfully"); 
-        console.log("New Database Created Successfully!")
-    })
-})
+// app.get('/CreateDB', (req, res) => {
+//     let sql = "CREATE DATABASE Todos";
+//     db.query(sql, (err, result) => {
+//         if(err) {
+//             throw err;
+//         }
+//         res.send("New Database Created Successfully"); 
+//         console.log("New Database Created Successfully!")
+//     })
+// })
 
-app.get('/CreateTable', (req, res) => {
-    let sql = "CREATE TABLE todos (id INT AUTO_INCREMENT, text VARCHAR(30), isCompleted BOOLEAN, PRIMARY KEY(id))";
-    db.query(sql, (err, result) => {
-        if(err) {
-            throw err;
-        }
-        res.send("New Table Created Successfully"); 
-        console.log("Todos Table Created Successfully!")
-    })
-})
+// app.get('/CreateTable', (req, res) => {
+//     let sql = "CREATE TABLE todos (id INT AUTO_INCREMENT, text VARCHAR(30), isCompleted BOOLEAN, PRIMARY KEY(id))";
+//     db.query(sql, (err, result) => {
+//         if(err) {
+//             throw err;
+//         }
+//         res.send("New Table Created Successfully"); 
+//         console.log("Todos Table Created Successfully!")
+//     })
+// })
 
-app.get('/addTodo/:text', (req, res) => {
-    let post = {text: req.params.text, isCompleted: false};
-    let sql = "INSERT INTO todos SET ?";
-    db.query(sql,post, (err, result) => {
+app.post('/addTodo', (req, res) => {
+    const text = req.body.text;
+    let sql = "INSERT INTO todos (text) VALUES (?)";
+    db.query(sql,[text], (err, result) => {
         if(err) {
             throw err;
         }
@@ -65,7 +71,7 @@ app.get('/addTodo/:text', (req, res) => {
 //         console.log("Second Record Inserted in the Table Successfully!")
 //     })
 // })
-
+//get all
 app.get('/allTodos', (req, res) => {
     let sql = "SELECT * FROM todos";
     db.query(sql, (err, result) => {
@@ -77,21 +83,24 @@ app.get('/allTodos', (req, res) => {
     })
 })
 
-app.get('/allTodos/:id', (req, res) => {
-    let sql = `SELECT * FROM todos WHERE id = ${req.params.id}`;
-    db.query(sql, (err, result) => {
-        if(err) {
-            throw err;
-        }
-        res.send("Data Selection Executed Successfully"); 
-        console.log(result)
-    })
-})
+//get one
+// app.get('/allTodos/:id', (req, res) => {
+//     let sql = `SELECT * FROM todos WHERE id = ${req.params.id}`;
+//     db.query(sql, (err, result) => {
+//         if(err) {
+//             throw err;
+//         }
+//         res.send("Data Selection Executed Successfully"); 
+//         console.log(result)
+//     })
+// })
 
-app.get('/UpdateTodo/:id', (req, res) => {
-    let newText = "This is new text";
-    let sql = `UPDATE todos SET text = '${newText}' WHERE id = ${req.params.id}`;
-    db.query(sql, (err, result) => {
+//update with put
+app.put('/UpdateTodo/:id', (req, res) => {
+    const text = req.body.text
+    const id= req.body.id
+    let sql = `UPDATE todos SET text = '${text}' WHERE id = ${id}`;
+    db.query(sql, [text, id], (err, result) => {
         if(err) {
             throw err;
         }
@@ -100,9 +109,11 @@ app.get('/UpdateTodo/:id', (req, res) => {
     })
 })
 
-app.get('/DeleteTodo/:id', (req, res) => {
-    let sql = `DELETE FROM todos WHERE id = ${req.params.id}`;
-    db.query(sql, (err, result) => {
+//delete with delete
+app.delete('/DeleteTodo/:id', (req, res) => {
+    const id = req.params.id;
+    let sql = 'DELETE FROM todos WHERE id = ?';
+    db.query(sql,id, (err, result) => {
         if(err) {
             throw err;
         }
@@ -126,6 +137,4 @@ app.get('/completeTodo/:id/:boolean', (req, res) => {
 app.listen(PORT, () => {
     console.log(`Listening on PORT ${PORT}`);
 })
-
-
 
